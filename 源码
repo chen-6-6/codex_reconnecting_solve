@@ -1,0 +1,40 @@
+@echo off
+setlocal
+
+set "PROXY=http://127.0.0.1:7897"
+set "NO_PROXY_LIST=127.0.0.1,localhost,::1"
+
+set "HTTP_PROXY=%PROXY%"
+set "HTTPS_PROXY=%PROXY%"
+set "ALL_PROXY=%PROXY%"
+set "WS_PROXY=%PROXY%"
+set "WSS_PROXY=%PROXY%"
+
+set "http_proxy=%PROXY%"
+set "https_proxy=%PROXY%"
+set "all_proxy=%PROXY%"
+set "ws_proxy=%PROXY%"
+set "wss_proxy=%PROXY%"
+
+set "NO_PROXY=%NO_PROXY_LIST%"
+set "no_proxy=%NO_PROXY_LIST%"
+
+taskkill /F /IM Codex.exe >nul 2>nul
+taskkill /F /IM codex.exe >nul 2>nul
+
+for /f "usebackq delims=" %%I in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$pkg = Get-AppxPackage -Name OpenAI.Codex; if ($pkg) { $pkg.InstallLocation }"`) do set "CODEX_DIR=%%I"
+
+if not defined CODEX_DIR (
+  echo OpenAI.Codex package was not found.
+  pause
+  exit /b 1
+)
+
+if not exist "%CODEX_DIR%\app\Codex.exe" (
+  echo Codex.exe not found:
+  echo "%CODEX_DIR%\app\Codex.exe"
+  pause
+  exit /b 1
+)
+
+start "" "%CODEX_DIR%\app\Codex.exe"
